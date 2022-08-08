@@ -5,7 +5,15 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { Observable } from '@apollo/client/utilities';
 import { GraphQLError } from 'graphql';
-import App from './App';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Todos from './todos/Todos';
+import Signup from './auth/Signup';
+import Login from './auth/Login';
 import { REFRESH_ACCESS_TOKEN } from './auth/mutations/refreshAccessToken.ts'
 
 const httpLink = createHttpLink({
@@ -63,6 +71,8 @@ const errorLink = onError(
                     };
 
                     forward(operation).subscribe(subscriber);
+
+                    <Navigate to="/" replace={true} />
                   } catch (err) {
                     observer.error(err);
                   }
@@ -102,8 +112,8 @@ const refreshToken = async () => {
     });
 
     const accessToken = response.data?.refreshAccessToken.accessToken;
-    console.log('new access token', accessToken)
     localStorage.setItem('accessToken', accessToken || '');
+
     return accessToken;
   } catch (err) {
     localStorage.clear();
@@ -115,7 +125,14 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Todos />} />
+          <Route path="/todos" element={<Todos />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
     </ApolloProvider>
   </React.StrictMode>
 );

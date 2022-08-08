@@ -5,9 +5,19 @@ import { useQuery } from "@apollo/client";
 import { LIST_TODOS, ListTodoData } from "./queries/listTodos";
 import { AddTodo } from "./AddTodo";
 import { TodosList } from "./TodosList";
+import { useNavigate } from "react-router-dom";
 
 function Todos() {
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery<ListTodoData>(LIST_TODOS);
+
+  React.useEffect(() => {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{`Error! ${error.message}`}</div>;

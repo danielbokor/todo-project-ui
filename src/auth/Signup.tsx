@@ -2,24 +2,26 @@ import { useMutation } from "@apollo/client";
 import { Button, Input } from "@mui/material";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LOGIN, Tokens } from "./mutations/login";
+import { User } from "../interfaces/user";
+import { SIGN_UP } from "./mutations/signUp";
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const [signup, { data }] = useMutation<
-    { login: Tokens },
-    { email: string; password: string }
-  >(LOGIN);
+    { signUp: User },
+    { name: string; email: string; password: string }
+  >(SIGN_UP);
 
   const submitHandler = (event: any) => {
     event.preventDefault();
 
     const {
+      name: { value: name },
       email: { value: email },
       password: { value: password },
     } = event.target.elements;
 
-    signup({ variables: { email, password } });
+    signup({ variables: { name, email, password } });
   };
 
   React.useEffect(() => {
@@ -31,28 +33,24 @@ export default function Login() {
   }, [navigate]);
 
   React.useEffect(() => {
-    if (!data?.login) {
+    if (!data?.signUp) {
       return;
     }
 
-    const { accessToken, refreshToken } = data.login;
-
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   }, [data, navigate]);
 
   return (
     <div>
-      <h1>Welcome back!</h1>
-      <p>Log in to continue.</p>
+      <h1>Welcome!</h1>
+      <p>Sign up to start using Simpledo today.</p>
       <form onSubmit={submitHandler}>
+        <Input id="name" placeholder="Full Name" />
         <Input id="email" type="email" placeholder="Email" />
         <Input id="password" type="password" placeholder="Password" />
-        <Link to="/signup">Don't have an account? Sign up.</Link>
+        <Link to="/login">Do have an account? Sign in.</Link>
         <Button variant="contained" type="submit">
-          Log in to continue.
+          Sign Up
         </Button>
       </form>
     </div>
